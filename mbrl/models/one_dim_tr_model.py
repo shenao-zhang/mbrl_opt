@@ -245,7 +245,7 @@ class OneDTransitionRewardModel(Model):
         #   returns = (returns - returns.mean()) / (returns.std() + eps)
         for log_prob, R in zip(log_probs, returns):
             model_value_loss.append(-log_prob * R.detach())
-        model_value_loss = torch.cat(model_value_loss).sum()
+        model_value_loss = torch.cat(model_value_loss).sum() * 0.2
 
         self.train()
         optimizer.zero_grad()
