@@ -212,7 +212,7 @@ class OneDTransitionRewardModel(Model):
         obs = env.reset()
         model_state = self.reset(obs)
 
-        obs = torch.from_numpy(obs).float()
+        obs = torch.from_numpy(obs).cpu().float()
 
         done = False
         while not done:
