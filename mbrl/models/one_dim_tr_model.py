@@ -216,7 +216,7 @@ class OneDTransitionRewardModel(Model):
 
         done = False
         while not done:
-            actions = agent.act(obs.float())
+            actions = agent.act(obs.cpu().float())
             (
                 next_observs,
                 pred_rewards,
