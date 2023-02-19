@@ -212,11 +212,11 @@ class OneDTransitionRewardModel(Model):
         obs = env.reset()
         model_state = self.reset(obs)
 
-        obs = torch.from_numpy(obs).float().to(self.device)
+        obs = torch.from_numpy(obs).float()
 
         done = False
         while not done:
-            actions = agent.act(obs.float().to(self.device))
+            actions = agent.act(obs.float())
             (
                 next_observs,
                 pred_rewards,
