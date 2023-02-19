@@ -207,13 +207,12 @@ class OneDTransitionRewardModel(Model):
         loss, meta = self.model.update(model_in, optimizer, target=target, agent=agent, env=env)
 
         # Value model gradient
-        obs_history = []
         reward_history = []
         log_probs = []
         obs = env.reset()
         model_state = self.reset(obs)
 
-        obs = torch.from_numpy(obs).float()
+        obs = torch.from_numpy(obs).float().to(self.device)
 
         done = False
         while not done:
