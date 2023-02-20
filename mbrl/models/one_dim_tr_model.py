@@ -242,8 +242,10 @@ class OneDTransitionRewardModel(Model):
             R = r + gamma * R
             returns.appendleft(R)
         returns = torch.tensor(returns)
-        eps = np.finfo(np.float32).eps.item()
-        returns = (returns - returns.mean()) / (returns.std() + eps)
+     #   eps = np.finfo(np.float32).eps.item()
+        if returns.dim() > 1:
+            returns = (returns - returns.mean()) / (returns.std() + 1e-5)
+
         for log_prob, R in zip(log_probs, returns):
             model_value_loss.append(-log_prob * R.detach())
         model_value_loss = torch.cat(model_value_loss).sum() * 0.02
