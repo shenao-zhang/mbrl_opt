@@ -236,7 +236,6 @@ class OneDTransitionRewardModel(Model):
             obs, reward, done, model_state = next_observs, rewards, dones, next_model_state
             reward_history.append(reward)
             log_probs.append(log_p)
-        print(count, ", rolloutlen")
         R = 0
         model_value_loss = []
         returns = deque()
