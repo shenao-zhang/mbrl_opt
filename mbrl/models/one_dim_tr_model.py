@@ -189,7 +189,7 @@ class OneDTransitionRewardModel(Model):
         batch: mbrl.types.TransitionBatch,
         optimizer: torch.optim.Optimizer,
         target: Optional[torch.Tensor] = None,
-        agent=None, env=None, termination_fn=None,
+        agent=None, env=None, termination_fn=None, coeff=None,
     ) -> Tuple[torch.Tensor, Dict[str, Any]]:
         """Updates the model given a batch of transitions and an optimizer.
 
@@ -205,7 +205,7 @@ class OneDTransitionRewardModel(Model):
         """
         assert target is None
         model_in, target = self._process_batch(batch)
-        loss, meta = self.model.update(model_in, optimizer, target=target, agent=agent, env=env)
+        loss, meta = self.model.update(model_in, optimizer, target=target, agent=agent, env=env, coeff=coeff)
 
         # Value model gradient
         reward_history = []
@@ -250,7 +250,7 @@ class OneDTransitionRewardModel(Model):
 
         for log_prob, R in zip(log_probs, returns):
             model_value_loss.append(-log_prob * R.detach())
-        model_value_loss = torch.cat(model_value_loss).mean() * 0.02
+        model_value_loss = torch.cat(model_value_loss).mean() * coeff
 
         self.train()
         optimizer.zero_grad()

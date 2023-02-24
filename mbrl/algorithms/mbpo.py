@@ -218,6 +218,8 @@ def train(
             )
 
             # --------------- Model Training -----------------
+            base_coeff = 1.0
+            coeff = env_steps / cfg.overrides.num_steps * base_coeff
             if env_steps % cfg.overrides.freq_train_model == 0:
                 mbrl.util.common.train_model_and_save_model_and_data(
                     dynamics_model,
@@ -228,6 +230,7 @@ def train(
                     agent=agent,
                     env=env,
                     termination_fn=termination_fn,
+                    coeff=coeff,
                 )
 
                 # NEW!
