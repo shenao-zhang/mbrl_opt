@@ -206,7 +206,7 @@ class OneDTransitionRewardModel(Model):
         assert target is None
         model_in, target = self._process_batch(batch)
         loss, meta = self.model.update(model_in, optimizer, target=target, agent=agent, env=env, coeff=coeff)
-        """
+
         # Value model gradient
         reward_history = []
         log_probs = []
@@ -257,8 +257,7 @@ class OneDTransitionRewardModel(Model):
         utils.clip_grad_norm(self.model.parameters(), 40)
         optimizer.step()
         return loss + model_value_loss.item(), meta
-        """
-        return loss, meta
+        #return loss, meta
 
     def eval_score(
         self,

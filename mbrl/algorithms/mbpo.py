@@ -117,6 +117,7 @@ def new_sac_buffer(
 
 def train(
     env: gym.Env,
+    dummy_env: gym.Env,
     test_env: gym.Env,
     termination_fn: mbrl.types.TermFnType,
     cfg: omegaconf.DictConfig,
@@ -228,7 +229,7 @@ def train(
                     replay_buffer,
                     work_dir=work_dir,
                     agent=agent,
-                    env=env,
+                    env=dummy_env,
                     termination_fn=termination_fn,
                     coeff=coeff,
                 )
