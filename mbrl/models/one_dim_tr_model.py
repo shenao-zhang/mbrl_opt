@@ -206,7 +206,7 @@ class OneDTransitionRewardModel(Model):
         assert target is None
         model_in, target = self._process_batch(batch)
         loss, meta = self.model.update(model_in, optimizer, target=target, agent=agent, env=env, coeff=coeff)
-
+        """
         # Value model gradient
         reward_history = []
         log_probs = []
@@ -251,13 +251,14 @@ class OneDTransitionRewardModel(Model):
         for log_prob, R in zip(log_probs, returns):
             model_value_loss.append(-log_prob * R.detach())
         model_value_loss = torch.cat(model_value_loss).mean() * coeff
-
         self.train()
         optimizer.zero_grad()
         model_value_loss.backward()
         utils.clip_grad_norm(self.model.parameters(), 40)
         optimizer.step()
         return loss + model_value_loss.item(), meta
+        """
+        return loss, meta
 
     def eval_score(
         self,
