@@ -156,6 +156,9 @@ class Model(nn.Module, abc.ABC):
              (float): the numeric value of the computed loss.
              (dict): any additional metadata dictionary computed by :meth:`loss`.
         """
+
+        loss, meta = self.loss(model_in, target)
+        """
         self.train()
         optimizer.zero_grad()
         loss, meta = self.loss(model_in, target)
@@ -168,6 +171,8 @@ class Model(nn.Module, abc.ABC):
                 meta["grad_norm"] = grad_norm
         optimizer.step()
         return loss.item(), meta
+        """
+        return loss, meta
 
     def reset(
         self, obs: torch.Tensor, rng: Optional[torch.Generator] = None

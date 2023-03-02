@@ -251,12 +251,19 @@ class OneDTransitionRewardModel(Model):
         for log_prob, R in zip(log_probs, returns):
             model_value_loss.append(-log_prob * R.detach())
         model_value_loss = torch.cat(model_value_loss).mean() * coeff
+        loss_total = loss + model_value_loss
         self.train()
         optimizer.zero_grad()
-        model_value_loss.backward()
-        utils.clip_grad_norm(self.model.parameters(), 40)
+        loss_total.backward()
+        if meta is not None:
+            with torch.no_grad():
+                grad_norm = 0.0
+                for p in list(filter(lambda p: p.grad is not None, self.parameters())):
+                    grad_norm += p.grad.data.norm(2).item() ** 2
+                meta["grad_norm"] = grad_norm
+      #  utils.clip_grad_norm(self.model.parameters(), 40)
         optimizer.step()
-        return loss + model_value_loss.item(), meta
+        return loss_total.item(), meta
         #return loss, meta
 
     def eval_score(
