@@ -156,12 +156,56 @@ class Model(nn.Module, abc.ABC):
              (float): the numeric value of the computed loss.
              (dict): any additional metadata dictionary computed by :meth:`loss`.
         """
-
-        loss, meta = self.loss(model_in, target)
-        """
         self.train()
         optimizer.zero_grad()
         loss, meta = self.loss(model_in, target)
+        """
+        # Value model gradient
+        reward_history = []
+        log_probs = []
+        obs = env.reset()
+        model_state = self.reset(obs)
+
+        obs = torch.from_numpy(obs).cpu().float()
+
+        done = False
+        count = 0
+        while not done:
+            count += 1
+            actions = agent.act(obs.cpu().float())
+            (
+                next_observs,
+                pred_rewards,
+                pred_terminals,
+                next_model_state,
+                log_p,
+            ) = self.sample(
+                actions,
+                model_state,
+                deterministic=False,
+            )
+            rewards = pred_rewards
+            dones = termination_fn(actions, next_observs)
+            obs, reward, done, model_state = next_observs, rewards, dones, next_model_state
+            reward_history.append(reward)
+            log_probs.append(log_p)
+        R = 0
+        model_value_loss = []
+        returns = deque()
+        gamma = 0.99
+        for r in reward_history[::-1]:
+            R = r + gamma * R
+            returns.appendleft(R)
+        returns = torch.tensor(returns)
+     #   eps = np.finfo(np.float32).eps.item()
+        if returns.dim() > 1:
+            returns = (returns - returns.mean()) / (returns.std() + 1e-5)
+
+        for log_prob, R in zip(log_probs, returns):
+            model_value_loss.append(-log_prob * R.detach())
+        model_value_loss = torch.cat(model_value_loss).mean() * coeff
+        loss_total = loss + model_value_loss
+        """
         loss.backward()
         if meta is not None:
             with torch.no_grad():
@@ -171,8 +215,6 @@ class Model(nn.Module, abc.ABC):
                 meta["grad_norm"] = grad_norm
         optimizer.step()
         return loss.item(), meta
-        """
-        return loss, meta
 
     def reset(
         self, obs: torch.Tensor, rng: Optional[torch.Generator] = None
