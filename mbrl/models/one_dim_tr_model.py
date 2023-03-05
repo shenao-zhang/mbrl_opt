@@ -206,7 +206,7 @@ class OneDTransitionRewardModel(Model):
         assert target is None
         model_in, target = self._process_batch(batch)
         loss, meta = self.model.update(model_in, optimizer, target=target, agent=agent, env=env, coeff=coeff)
-        """
+
         # Value model gradient
         reward_history = []
         log_probs = []
@@ -252,8 +252,8 @@ class OneDTransitionRewardModel(Model):
             model_value_loss.append(-log_prob * R.detach())
         model_value_loss = torch.cat(model_value_loss).mean() * coeff
         loss_total = loss + model_value_loss
-        """
-        loss_total = loss
+
+     #   loss_total = loss
         loss_total.backward()
         if meta is not None:
             with torch.no_grad():
