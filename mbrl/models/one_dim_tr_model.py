@@ -221,7 +221,7 @@ class OneDTransitionRewardModel(Model):
         count = 0
         while not done:
             count += 1
-            actions = agent.act(obs)
+            actions = agent.act(obs.cpu().float())
             (
                 next_observs,
                 pred_rewards,
